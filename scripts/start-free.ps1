@@ -12,9 +12,17 @@ echo.
 
 where cloudflared >nul 2>&1
 if %ERRORLEVEL% neq 0 (
-  echo ERROR: cloudflared not found. Install with:
-  echo   winget install Cloudflare.cloudflared
-  exit /b 1
+  if exist "%ProgramFiles(x86)%\cloudflared\cloudflared.exe" (
+    set "CLOUDFLARED=%ProgramFiles(x86)%\cloudflared\cloudflared.exe"
+  ) else if exist "%ProgramFiles%\cloudflared\cloudflared.exe" (
+    set "CLOUDFLARED=%ProgramFiles%\cloudflared\cloudflared.exe"
+  ) else (
+    echo ERROR: cloudflared not found. Install with:
+    echo   winget install Cloudflare.cloudflared
+    exit /b 1
+  )
+) else (
+  set "CLOUDFLARED=cloudflared"
 )
 
 cd /d "%~dp0.."
@@ -22,4 +30,4 @@ call npx concurrently --kill-others ^
   --names "API,TUNNEL" ^
   --prefix-colors "blue,green" ^
   "npm run dev:server" ^
-  "cloudflared tunnel --url http://localhost:3001"
+  "%CLOUDFLARED% tunnel --url http://localhost:3001"
