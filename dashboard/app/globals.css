@@ -296,10 +296,20 @@ h2 {
   background: #3b82f6;
 }
 
-.leaflet-tooltip {
-  background: var(--surface);
+.map-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.map-reset-btn {
+  background: transparent !important;
   border: 1px solid var(--surface2);
-  color: var(--text);
-  font-weight: 600;
-  font-size: 0.75rem;
+  color: var(--muted) !important;
+}
+
+.map-reset-btn:hover {
+  color: var(--danger) !important;
+  border-color: var(--danger);
 }

@@ -146,6 +146,13 @@ export async function updateLocations(
   });
 }
 
+export async function resetLocations(id: string) {
+  return api<{ person: MonitoredPerson }>(`/api/persons/${id}/locations`, {
+    method: "PATCH",
+    body: JSON.stringify({ clear: true }),
+  });
+}
+
 export async function getAnomalies(id: string) {
   return api<{ anomalies: Anomaly[] }>(`/api/persons/${id}/anomalies`);
 }

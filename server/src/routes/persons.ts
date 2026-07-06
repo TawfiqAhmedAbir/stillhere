@@ -105,8 +105,23 @@ router.patch("/:id/locations", async (req, res) => {
     return;
   }
 
-  const { homeLat, homeLng, workLat, workLng, homeRadiusM, workRadiusM } =
+  const { homeLat, homeLng, workLat, workLng, homeRadiusM, workRadiusM, clear } =
     req.body;
+
+  if (clear === true) {
+    const updated = await prisma.monitoredPerson.update({
+      where: { id: person.id },
+      data: {
+        homeLat: null,
+        homeLng: null,
+        workLat: null,
+        workLng: null,
+        setupComplete: false,
+      },
+    });
+    res.json({ person: updated });
+    return;
+  }
 
   const updated = await prisma.monitoredPerson.update({
     where: { id: person.id },

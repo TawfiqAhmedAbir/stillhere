@@ -15,7 +15,10 @@ interface LocationMapProps {
   onHomeChange: (p: MapPoint) => void;
   onWorkChange: (p: MapPoint) => void;
   onSave: () => void;
+  onReset?: () => void;
   saving?: boolean;
+  resetting?: boolean;
+  saved?: boolean;
 }
 
 type PlaceMode = "home" | "work" | null;
@@ -55,7 +58,10 @@ export default function LocationMap({
   onHomeChange,
   onWorkChange,
   onSave,
+  onReset,
   saving,
+  resetting,
+  saved,
 }: LocationMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -228,15 +234,26 @@ export default function LocationMap({
         <span><i className="dot work" /> Work {work ? `(${work.lat.toFixed(4)}, ${work.lng.toFixed(4)})` : "— not set"}</span>
       </div>
 
-      <button
-        type="button"
-        className="btn"
-        style={{ marginTop: "0.75rem" }}
-        onClick={onSave}
-        disabled={saving || !home || !work}
-      >
-        {saving ? "Saving…" : "Save locations"}
-      </button>
+      <div className="map-actions">
+        <button
+          type="button"
+          className="btn"
+          onClick={onSave}
+          disabled={saving || resetting || !home || !work}
+        >
+          {saving ? "Saving…" : saved ? "Locations saved ✓" : "Save locations"}
+        </button>
+        {onReset && (home || work || saved) && (
+          <button
+            type="button"
+            className="btn btn-secondary map-reset-btn"
+            onClick={onReset}
+            disabled={saving || resetting}
+          >
+            {resetting ? "Resetting…" : "Reset locations"}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

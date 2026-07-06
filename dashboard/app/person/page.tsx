@@ -10,6 +10,7 @@ import {
   getAnomalies,
   updateRoutine,
   updateLocations,
+  resetLocations,
   API_URL,
   type MonitoredPerson,
   type LocationPing,
@@ -26,6 +27,7 @@ function PersonPageContent() {
   const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
   const [saving, setSaving] = useState(false);
   const [savingPlaces, setSavingPlaces] = useState(false);
+  const [resettingPlaces, setResettingPlaces] = useState(false);
   const [message, setMessage] = useState("");
   const [homeDraft, setHomeDraft] = useState<MapPoint | null>(null);
   const [workDraft, setWorkDraft] = useState<MapPoint | null>(null);
@@ -78,6 +80,30 @@ function PersonPageContent() {
       setMessage(err instanceof Error ? err.message : "Save failed");
     } finally {
       setSavingPlaces(false);
+    }
+  }
+
+  async function resetPlaces() {
+    if (!id) return;
+    if (
+      !confirm(
+        "Clear home and work locations? Monitoring will pause until you save new ones."
+      )
+    ) {
+      return;
+    }
+    setResettingPlaces(true);
+    setMessage("");
+    try {
+      const { person: updated } = await resetLocations(id);
+      setPerson(updated);
+      setHomeDraft(null);
+      setWorkDraft(null);
+      setMessage("Locations reset — place home and work again");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Reset failed");
+    } finally {
+      setResettingPlaces(false);
     }
   }
 
@@ -222,7 +248,10 @@ function PersonPageContent() {
           onHomeChange={handleHomeChange}
           onWorkChange={handleWorkChange}
           onSave={savePlaces}
+          onReset={resetPlaces}
           saving={savingPlaces}
+          resetting={resettingPlaces}
+          saved={person.setupComplete}
         />
         {!person.setupComplete && homeDraft && workDraft && (
           <p style={{ marginTop: "0.75rem", color: "var(--warning)" }}>
@@ -231,7 +260,7 @@ function PersonPageContent() {
         )}
         {person.setupComplete && (
           <p style={{ marginTop: "0.75rem", color: "var(--success)" }}>
-            Monitoring active
+            Monitoring active — use <strong>Reset locations</strong> to change them
           </p>
         )}
       </div>
