@@ -1,16 +1,17 @@
 # Deploy StillHere API to Fly.io (24/7, no PC required)
 
-The API runs on **Fly.io** (always on). The database runs on **Neon** (free PostgreSQL).
+The API runs on **Fly.io** (always on, London region). Database is **SQLite on a Fly volume** (free, persistent).
 
 | Service | Free tier | Role |
 |---------|-----------|------|
-| [Neon](https://neon.tech) | Free PostgreSQL | Database (persistent) |
-| [Fly.io](https://fly.io) | Free allowance* | API + routine engine 24/7 |
-| GitHub Pages | Free | Dashboard (already live) |
+| [Fly.io](https://fly.io) | Free allowance* | API + SQLite DB + routine engine 24/7 |
+| GitHub Pages | Free | Dashboard (caregiver UI) |
 
-\*Fly.io may ask for a credit card to verify identity; you stay within free limits for this small app.
+\*Fly.io may ask for a credit card to verify identity.
 
-**Live API URL after deploy:** `https://stillhere-api.fly.dev`
+**Live API:** https://stillhere-api.fly.dev
+
+> Neon PostgreSQL is optional — the app currently uses SQLite on Fly's free 1GB volume.
 
 ---
 

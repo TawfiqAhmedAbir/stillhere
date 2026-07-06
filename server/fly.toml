@@ -8,6 +8,7 @@ primary_region = "lhr"
 [env]
   PORT = "8080"
   UPLOAD_DIR = "/data/uploads"
+  DATABASE_URL = "file:/data/dev.db"
 
 [http_service]
   internal_port = 8080

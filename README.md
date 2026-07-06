@@ -104,11 +104,13 @@ Use your computer's LAN IP, not `localhost`.
 
 **Recommended:** [docs/deploy-cloud.md](docs/deploy-cloud.md) — Fly.io + Neon PostgreSQL (free tiers).
 
+**Live API:** https://stillhere-api.fly.dev  
+**Live dashboard:** https://tawfiqahmedabir.github.io/stillhere/
+
 Quick summary:
-1. Create free DB at [neon.tech](https://neon.tech)
-2. `winget install Fly-io.flyctl` → `fly auth login`
-3. Deploy from `server/` — see deploy guide
-4. API lives at `https://stillhere-api.fly.dev` permanently
+1. API is deployed on Fly.io (24/7, no PC needed)
+2. Dashboard on GitHub Pages — sign in on your iPhone
+3. Mom's app: `EXPO_PUBLIC_API_URL=https://stillhere-api.fly.dev`
 
 **Home PC tunnel (old method):** [docs/free-deployment.md](docs/free-deployment.md) — only if you don't want cloud.
 
