@@ -9,7 +9,7 @@ import { notifyCaregiver } from "../lib/push.js";
 import { formatCheckpoint } from "../lib/routine-engine.js";
 
 const router = Router();
-const uploadDir = path.join(process.cwd(), "uploads");
+const uploadDir = process.env.UPLOAD_DIR || path.join(process.cwd(), "uploads");
 fs.mkdirSync(uploadDir, { recursive: true });
 
 const upload = multer({ dest: uploadDir });

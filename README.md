@@ -100,53 +100,17 @@ EXPO_PUBLIC_API_URL=http://192.168.x.x:3001
 
 Use your computer's LAN IP, not `localhost`.
 
-## Production deployment ($0 — recommended)
+## Production deployment ($0 cloud — runs 24/7, no PC)
 
-**Full guide:** [docs/free-deployment.md](docs/free-deployment.md)
+**Recommended:** [docs/deploy-cloud.md](docs/deploy-cloud.md) — Fly.io + Neon PostgreSQL (free tiers).
 
-| Piece | Free solution |
-|-------|---------------|
-| Dashboard (your iPhone) | [GitHub Pages](https://tawfiqahmedabir.github.io/stillhere/) |
-| API + database | Your PC + SQLite |
-| Public HTTPS | [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (free) |
-| Mom's app | Expo Go or sideload APK (no Play Store fee) |
+Quick summary:
+1. Create free DB at [neon.tech](https://neon.tech)
+2. `winget install Fly-io.flyctl` → `fly auth login`
+3. Deploy from `server/` — see deploy guide
+4. API lives at `https://stillhere-api.fly.dev` permanently
 
-### Quick start (free)
-
-```powershell
-# 1. Install tunnel (once)
-winget install Cloudflare.cloudflared
-
-# 2. Start API + free HTTPS tunnel
-npm run db:push
-npm run free
-```
-
-Copy the `https://….trycloudflare.com` URL from the terminal.
-
-```powershell
-# 3. Set GitHub secret + redeploy dashboard
-.\scripts\set-api-url.ps1 -ApiUrl "https://YOUR-URL.trycloudflare.com"
-gh workflow run deploy-pages.yml --repo TawfiqAhmedAbir/stillhere
-
-# 4. Point Mom's app at the same URL
-echo EXPO_PUBLIC_API_URL=https://YOUR-URL.trycloudflare.com > mobile/.env
-npm run dev:mobile
-```
-
-Then sign in on your iPhone: **https://tawfiqahmedabir.github.io/stillhere/**
-
-> **Keep your PC on** while monitoring is active. Quick tunnel URLs change when you restart — run `set-api-url.ps1` again if that happens.
-
-### GitHub Pages (dashboard only)
-
-Auto-deploys on push to `main`. Requires secret `NEXT_PUBLIC_API_URL` pointing at your tunnel URL.
-
-GitHub Pages cannot run the API — it only hosts the caregiver UI.
-
-### Paid hosting (optional)
-
-Railway, Render, Fly.io, Play Store ($25) — not required. See `docs/free-deployment.md` for the $0 path.
+**Home PC tunnel (old method):** [docs/free-deployment.md](docs/free-deployment.md) — only if you don't want cloud.
 
 ---
 
