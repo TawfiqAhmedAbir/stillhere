@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String            @id @default(uuid())
+  email            String            @unique
+  passwordHash     String
+  name             String
+  pushSubscription String?
+  createdAt        DateTime          @default(now())
+  persons          MonitoredPerson[]
+}
+
+model MonitoredPerson {
+  id              String          @id @default(uuid())
+  name            String
+  pairingCode     String          @unique
+  caregiverId     String
+  caregiver       User            @relation(fields: [caregiverId], references: [id], onDelete: Cascade)
+  deviceToken     String?
+  homeLat         Float?
+  homeLng         Float?
+  homeRadiusM     Int             @default(150)
+  workLat         Float?
+  workLng         Float?
+  workRadiusM     Int             @default(150)
+  leaveHomeTime   String          @default("13:00")
+  workStartTime   String          @default("14:00")
+  workEndTime     String          @default("18:00")
+  arriveHomeTime  String          @default("19:00")
+  graceMinutes    Int             @default(10)
+  responseMinutes Int             @default(5)
+  timezone        String          @default("Europe/London")
+  setupComplete   Boolean         @default(false)
+  locationPings   LocationPing[]
+  anomalies       Anomaly[]
+  dailyChecks     DailyCheckpoint[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model LocationPing {
+  id        String          @id @default(uuid())
+  personId  String
+  person    MonitoredPerson @relation(fields: [personId], references: [id], onDelete: Cascade)
+  lat       Float
+  lng       Float
+  place     String
+  createdAt DateTime        @default(now())
+
+  @@index([personId, createdAt])
+}
+
+model Anomaly {
+  id          String          @id @default(uuid())
+  personId    String
+  person      MonitoredPerson @relation(fields: [personId], references: [id], onDelete: Cascade)
+  checkpoint  String
+  status      String          @default("TRIGGERED")
+  message     String
+  triggeredAt DateTime        @default(now())
+  respondedAt DateTime?
+  escalatedAt DateTime?
+  response    Response?
+
+  @@index([personId, status])
+}
+
+model Response {
+  id        String   @id @default(uuid())
+  anomalyId String   @unique
+  anomaly   Anomaly  @relation(fields: [anomalyId], references: [id], onDelete: Cascade)
+  type      String
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model DailyCheckpoint {
+  id         String          @id @default(uuid())
+  personId   String
+  person     MonitoredPerson @relation(fields: [personId], references: [id], onDelete: Cascade)
+  date       String
+  checkpoint String
+  anomalyId  String?
+
+  @@unique([personId, date, checkpoint])
+}

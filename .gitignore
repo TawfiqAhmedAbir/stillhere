@@ -1,0 +1,16 @@
+node_modules/
+.next/
+out/
+dashboard/out/
+dist/
+build/
+.expo/
+*.db
+*.db-jwt
+.env
+.env.local
+.env*.local
+uploads/
+*.log
+.DS_Store
+Thumbs.db

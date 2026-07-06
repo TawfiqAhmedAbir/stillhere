@@ -1,0 +1,11 @@
+{
+  "folders": [
+    { "name": "stillhere (root)", "path": "." },
+    { "name": "server (API)", "path": "server" },
+    { "name": "dashboard (iPhone web)", "path": "dashboard" },
+    { "name": "mobile (Mom Android)", "path": "mobile" }
+  ],
+  "settings": {
+    "typescript.tsdk": "node_modules/typescript/lib"
+  }
+}

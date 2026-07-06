@@ -1,0 +1,16 @@
+{
+  "name": "StillHere",
+  "short_name": "StillHere",
+  "description": "Family routine safety alerts",
+  "start_url": "/stillhere/dashboard/",
+  "display": "standalone",
+  "background_color": "#0f1419",
+  "theme_color": "#0f1419",
+  "icons": [
+    {
+      "src": "/stillhere/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
