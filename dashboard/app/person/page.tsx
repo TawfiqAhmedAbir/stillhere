@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import LocationMap from "@/components/LocationMapLoader";
+import type { MapPoint } from "@/components/LocationMapLoader";
 import {
   getPerson,
   getAnomalies,
@@ -23,7 +25,10 @@ function PersonPageContent() {
   const [activeAnomaly, setActiveAnomaly] = useState<Anomaly | null>(null);
   const [anomalies, setAnomalies] = useState<Anomaly[]>([]);
   const [saving, setSaving] = useState(false);
+  const [savingPlaces, setSavingPlaces] = useState(false);
   const [message, setMessage] = useState("");
+  const [homeDraft, setHomeDraft] = useState<MapPoint | null>(null);
+  const [workDraft, setWorkDraft] = useState<MapPoint | null>(null);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -39,6 +44,12 @@ function PersonPageContent() {
     setLatestPing(detail.latestPing);
     setActiveAnomaly(detail.activeAnomaly);
     setAnomalies(history.anomalies);
+    if (detail.person.homeLat != null && detail.person.homeLng != null) {
+      setHomeDraft({ lat: detail.person.homeLat, lng: detail.person.homeLng });
+    }
+    if (detail.person.workLat != null && detail.person.workLng != null) {
+      setWorkDraft({ lat: detail.person.workLat, lng: detail.person.workLng });
+    }
   }, [id, router]);
 
   useEffect(() => {
@@ -46,6 +57,29 @@ function PersonPageContent() {
     const interval = setInterval(load, 30_000);
     return () => clearInterval(interval);
   }, [load]);
+
+  const handleHomeChange = useCallback((p: MapPoint) => setHomeDraft(p), []);
+  const handleWorkChange = useCallback((p: MapPoint) => setWorkDraft(p), []);
+
+  async function savePlaces() {
+    if (!id || !homeDraft || !workDraft) return;
+    setSavingPlaces(true);
+    setMessage("");
+    try {
+      const { person: updated } = await updateLocations(id, {
+        homeLat: homeDraft.lat,
+        homeLng: homeDraft.lng,
+        workLat: workDraft.lat,
+        workLng: workDraft.lng,
+      });
+      setPerson(updated);
+      setMessage("Locations saved — monitoring active");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setSavingPlaces(false);
+    }
+  }
 
   async function saveRoutine(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -69,27 +103,6 @@ function PersonPageContent() {
     } finally {
       setSaving(false);
     }
-  }
-
-  async function saveLocation(type: "home" | "work") {
-    if (!person || !id) return;
-    if (!navigator.geolocation) {
-      setMessage("Geolocation not available on this device");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(async (pos) => {
-      try {
-        const data =
-          type === "home"
-            ? { homeLat: pos.coords.latitude, homeLng: pos.coords.longitude }
-            : { workLat: pos.coords.latitude, workLng: pos.coords.longitude };
-        const { person: updated } = await updateLocations(id, data);
-        setPerson(updated);
-        setMessage(`${type === "home" ? "Home" : "Work"} location saved`);
-      } catch (err) {
-        setMessage(err instanceof Error ? err.message : "Save failed");
-      }
-    });
   }
 
   if (!id) {
@@ -199,19 +212,26 @@ function PersonPageContent() {
       </div>
 
       <div className="card">
-        <h2>Places</h2>
+        <h2>Home &amp; work</h2>
         <p className="subtitle">
-          Stand at home/work with Mom&apos;s phone, or use your location if you&apos;re there now.
+          Search an address or tap the map to place home and work. Drag pins to fine-tune.
         </p>
-        <button className="btn btn-secondary" type="button" onClick={() => saveLocation("home")} style={{ marginBottom: "0.5rem" }}>
-          Set home location {person.homeLat ? "✓" : ""}
-        </button>
-        <button className="btn btn-secondary" type="button" onClick={() => saveLocation("work")}>
-          Set work location {person.workLat ? "✓" : ""}
-        </button>
-        {!person.setupComplete && (
+        <LocationMap
+          home={homeDraft}
+          work={workDraft}
+          onHomeChange={handleHomeChange}
+          onWorkChange={handleWorkChange}
+          onSave={savePlaces}
+          saving={savingPlaces}
+        />
+        {!person.setupComplete && homeDraft && workDraft && (
           <p style={{ marginTop: "0.75rem", color: "var(--warning)" }}>
-            Set both home and work to start monitoring.
+            Tap <strong>Save locations</strong> to start monitoring.
+          </p>
+        )}
+        {person.setupComplete && (
+          <p style={{ marginTop: "0.75rem", color: "var(--success)" }}>
+            Monitoring active
           </p>
         )}
       </div>
