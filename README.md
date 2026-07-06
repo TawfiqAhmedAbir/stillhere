@@ -100,31 +100,57 @@ EXPO_PUBLIC_API_URL=http://192.168.x.x:3001
 
 Use your computer's LAN IP, not `localhost`.
 
-## Production deployment
+## Production deployment ($0 — recommended)
 
-### GitHub Pages (caregiver dashboard — your iPhone)
+**Full guide:** [docs/free-deployment.md](docs/free-deployment.md)
 
-The dashboard deploys automatically on every push to `main`.
+| Piece | Free solution |
+|-------|---------------|
+| Dashboard (your iPhone) | [GitHub Pages](https://tawfiqahmedabir.github.io/stillhere/) |
+| API + database | Your PC + SQLite |
+| Public HTTPS | [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) (free) |
+| Mom's app | Expo Go or sideload APK (no Play Store fee) |
 
-**Live URL:** https://tawfiqahmedabir.github.io/stillhere/
+### Quick start (free)
 
-1. In GitHub repo **Settings → Pages**, set source to **GitHub Actions** (first deploy enables this).
-2. In **Settings → Secrets → Actions**, add:
-   - `NEXT_PUBLIC_API_URL` — your deployed API URL (see below)
+```powershell
+# 1. Install tunnel (once)
+winget install Cloudflare.cloudflared
 
-GitHub Pages hosts the **dashboard only** (static files). It cannot run the API or Android app.
+# 2. Start API + free HTTPS tunnel
+npm run db:push
+npm run free
+```
 
-### API server (required for the app to work)
+Copy the `https://….trycloudflare.com` URL from the terminal.
 
-Deploy `server/` separately to Railway, Render, or Fly.io, then set `NEXT_PUBLIC_API_URL` to that URL.
+```powershell
+# 3. Set GitHub secret + redeploy dashboard
+.\scripts\set-api-url.ps1 -ApiUrl "https://YOUR-URL.trycloudflare.com"
+gh workflow run deploy-pages.yml --repo TawfiqAhmedAbir/stillhere
 
-### Android app (Mom)
+# 4. Point Mom's app at the same URL
+echo EXPO_PUBLIC_API_URL=https://YOUR-URL.trycloudflare.com > mobile/.env
+npm run dev:mobile
+```
 
-Build with Expo EAS and install on her phone. Point `EXPO_PUBLIC_API_URL` at the same deployed API.
+Then sign in on your iPhone: **https://tawfiqahmedabir.github.io/stillhere/**
+
+> **Keep your PC on** while monitoring is active. Quick tunnel URLs change when you restart — run `set-api-url.ps1` again if that happens.
+
+### GitHub Pages (dashboard only)
+
+Auto-deploys on push to `main`. Requires secret `NEXT_PUBLIC_API_URL` pointing at your tunnel URL.
+
+GitHub Pages cannot run the API — it only hosts the caregiver UI.
+
+### Paid hosting (optional)
+
+Railway, Render, Fly.io, Play Store ($25) — not required. See `docs/free-deployment.md` for the $0 path.
 
 ---
 
-## Production deployment (self-hosted)
+## Production deployment (legacy / paid options)
 
 | Component | Suggested host |
 |-----------|----------------|

@@ -1,0 +1,17 @@
+# Copy to config.yml and fill in your tunnel ID + hostname.
+# Requires a free Cloudflare account and a domain on Cloudflare.
+#
+# Setup:
+#   cloudflared tunnel login
+#   cloudflared tunnel create stillhere
+#   cloudflared tunnel route dns stillhere stillhere-api.yourdomain.com
+#
+# Run: npm run free:stable
+
+tunnel: YOUR_TUNNEL_ID
+credentials-file: C:\Users\YOU\.cloudflared\YOUR_TUNNEL_ID.json
+
+ingress:
+  - hostname: stillhere-api.yourdomain.com
+    service: http://localhost:3001
+  - service: http_status:404

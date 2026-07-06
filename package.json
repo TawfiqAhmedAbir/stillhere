@@ -8,6 +8,8 @@
     "dev:server": "npm run dev --workspace=server",
     "dev:dashboard": "npm run dev --workspace=dashboard",
     "dev:mobile": "npm run start --workspace=mobile",
+    "free": "powershell -ExecutionPolicy Bypass -File scripts/start-free.ps1",
+    "free:stable": "powershell -ExecutionPolicy Bypass -File scripts/start-free-stable.ps1",
     "build": "npm run build --workspace=server && npm run build --workspace=dashboard",
     "db:push": "npm run db:push --workspace=server",
     "db:studio": "npm run db:studio --workspace=server"

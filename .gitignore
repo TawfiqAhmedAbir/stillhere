@@ -13,4 +13,4 @@ build/
 uploads/
 *.log
 .DS_Store
-Thumbs.db
+cloudflared/config.yml
